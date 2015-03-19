@@ -27,6 +27,36 @@
                 </c:forEach>
             </ul>
         </c:if>
-        
+        <button id="simpleBtn">Load something...</button>
+        <script type="text/javascript">
+            
+            function xhrHandler() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/SampleProject/app/module/?_='+Date.now(), true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.onload = function (e) {
+                    console.log(e);
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            console.log(JSON.parse(xhr.response));
+                            console.log(xhr);
+                        } else {
+                            console.error(xhr.statusText);
+                        }
+                    }
+                };
+                xhr.onerror = function (e) {
+                    console.error(xhr.statusText);
+                };
+                xhr.send(null);
+            }
+            
+            var btn = document.getElementById('simpleBtn');
+            btn.addEventListener('click', function() {
+                xhrHandler();
+            });
+    
+            
+        </script>
     </body>
 </html>

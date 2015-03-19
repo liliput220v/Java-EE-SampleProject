@@ -2,17 +2,15 @@
 package net.a220vfor.modules;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import net.a220vfor.core.DB;
+import net.a220vfor.core.FilteredHttpRequest;
 import net.a220vfor.core.Module;
 
 /**
@@ -23,7 +21,7 @@ public class IndexPageModule extends Module {
 
     private final DataSource pool;
     
-    public IndexPageModule(HttpServletRequest request) throws ServletException {
+    public IndexPageModule(FilteredHttpRequest request) throws ServletException {
         super(request);
         
         DB db = DB.getInstance();

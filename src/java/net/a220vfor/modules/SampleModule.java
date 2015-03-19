@@ -1,7 +1,10 @@
 
 package net.a220vfor.modules;
 
-import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import javax.json.Json;
+import javax.json.JsonObject;
+import net.a220vfor.core.FilteredHttpRequest;
 import net.a220vfor.core.Module;
 
 /**
@@ -10,7 +13,7 @@ import net.a220vfor.core.Module;
  */
 public class SampleModule extends Module {
     
-    public SampleModule(HttpServletRequest request) {
+    public SampleModule(FilteredHttpRequest request) {
         super(request);
         
         template = "module";
@@ -22,11 +25,14 @@ public class SampleModule extends Module {
     @Override
     public void index() {
         
+        JsonObject json = Json.createObjectBuilder()
+            .add("paramKey", "param-value + Кириллица")
+            .add("array", Json.createArrayBuilder()
+                .add("some value in the array & *")
+                .add(System.currentTimeMillis()))
+            .build();
+        
+        request.setAttribute("json", json);
     }
-    
-    // probably, actions should return or set its content template
-    public void action1() {}
-    public void action2() {}
-    public void action3() {}
     
 }

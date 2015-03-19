@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -13,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public abstract class Module {
     
-    protected HttpServletRequest request;
+    protected FilteredHttpRequest request;
     
     /**
      * The main template that is related to the module.
@@ -25,14 +24,23 @@ public abstract class Module {
      */
     protected String actionTemplate;
     
-    public Module(HttpServletRequest request) {
+    public Module(FilteredHttpRequest request) {
         this.request = request;
     }
     
+    /**
+     * Returns module's template.
+     * @return 
+     */
     public String getTemplate() {
         return template;
     }
-
+    
+    /**
+     * Sets a template related to this module.
+     * 
+     * @param template the template name without .jsp extension
+     */
     public void setTemplate(String template) {
         this.template = template;
     }
@@ -43,23 +51,30 @@ public abstract class Module {
     public abstract void index();
     
     /**
-     * 
-     * @param actions the action list to execute
-     * @throws ServletException 
+     * Executes requested action.
+     * @throws ServletException if the action can't be found or invoked
      */
-    public void executeActions(List<String> actions) throws ServletException {
+    public void executeAction() throws ServletException {
+        executeAction(request.getAction());
+    }
+    
+    /**
+     * Executes requested action.
+     * 
+     * @param action the action to be executed
+     * @throws ServletException if the action can't be found or invoked
+     */
+    public void executeAction(String action) throws ServletException {
         
-        for (String action : actions) {
-            try {
+        try {
+            Method method = this.getClass().getMethod(action);
+            method.invoke(this);
 
-                Method method = this.getClass().getMethod(action);
-                method.invoke(this);
-
-            } catch (NoSuchMethodException | SecurityException e) {
-                throw new ServletException("The action '" + action + "' wasn't found.", e);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new ServletException("The action '" + action + "' can't be invoked.", e);
-            }
+        } catch (NoSuchMethodException | SecurityException e) {
+            throw new ServletException("The action '" + action + "' wasn't found.", e);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new ServletException("The action '" + action + "' can't be invoked.", e);
         }
+        
     }
 }

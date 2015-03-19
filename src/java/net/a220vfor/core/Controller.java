@@ -6,11 +6,12 @@
 package net.a220vfor.core;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import javax.json.Json;
+import javax.json.JsonStructure;
+import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,115 +42,41 @@ public class Controller extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        //<editor-fold defaultstate="collapsed" desc="Debug path info.">
-        String pathInfo = request.getPathInfo();
-        request.setAttribute("pathInfo", pathInfo);
-        String queryString = request.getQueryString();
-        request.setAttribute("queryString", queryString);
-        //</editor-fold>
-        
         // Example path: Servlet/app/module-name/action?param1=value1&param2=value2#hash
         
-        // first of all, we need to get module name and its actions to execute
-        List<String> pathInfoList = getPathAsList(request);
-        String moduleName = getModuleName(pathInfoList);
-        List<String> actions = getActions(pathInfoList);
+        // first of all, we need to get module name and its action to execute
+        FilteredHttpRequest filtRequest = new MainHttpRequest(request);
         
-        // now we can load the module and execute its actions, if any of them exist    
-        Module module = new ModuleFactory(request, availModules).getModule(moduleName);
-        module.executeActions(actions);
+        // now we can load the module and execute its action, if any it exist    
+        Module module = new ModuleFactory(filtRequest, availModules).getModule();
+        module.executeAction();
         String template = module.getTemplate();
         
-        request.getRequestDispatcher("/" + template + ".jsp").forward(request, response);
-        
-        
-    }
-
-    
-    
-    //<editor-fold defaultstate="collapsed" desc="Method for debug.">
-    private String getQueryAsString(Map<String, String[]> queryMap) {
-        
-        StringBuilder output = new StringBuilder();
-        
-        for (Map.Entry<String, String[]> entry : queryMap.entrySet()) {
-            output.append(entry.getKey());
-            output.append(Arrays.toString(entry.getValue()));
-            output.append("<br>");
+        if (filtRequest.isAjax()) {
+            sendJSON(filtRequest, response);
+        } else {
+            filtRequest.getRequestDispatcher("/" + template + ".jsp").forward(filtRequest, response);
         }
-        
-        return output.toString();
-    }
-    //</editor-fold>
-    
-    /**
-     * Returns a <code>List</code> representation of path component in the request.
-     * 
-     * @param request the servlet request
-     * @return a list of requested actions
-     */
-    private List<String> getPathAsList(HttpServletRequest request) {
-        
-        List<String> items = new ArrayList<>(5);
-        for (String action : request.getPathInfo().split("/")) {
-            if (action.length() > 0) items.add(action);
-        }
-        
-        return items;
+                
     }
     
-    /**
-     * Retrieves module name out of the path action list.
-     * 
-     * @param pathInfoList the list of path elements
-     * @return a module name or 'index', if it is not provided by the client
-     */
-    private String getModuleName(List<String> pathInfoList) {
+    private void sendJSON(FilteredHttpRequest request, HttpServletResponse response) throws IOException {
         
-        String moduleName = "index";
+        response.setContentType("application/json; charset=UTF-8");
         
-        if (!pathInfoList.isEmpty()) {
-            moduleName = pathInfoList.get(0);
+        try (PrintWriter out = response.getWriter()) {
+            
+            JsonStructure json = (JsonStructure) request.getAttribute("json");
+            
+            if (json == null) {
+                out.println("{error: \"No JSON object found!\"}");
+                return;
+            }
+            
+            try (JsonWriter jWriter = Json.createWriter(out)) {
+                jWriter.write(json);
+            }
         }
-        
-        return moduleName;
-    }
-    
-    /**
-     * Retrieves action list out of the path action list.
-     * 
-     * @param pathInfoList the list of path elements
-     * @return a list of requested actions; 
-     *         if actions hasn't been provided by the client, the list will contain only 'index' action
-     */
-    private List<String> getActions(List<String> pathInfoList) {
-        
-        List<String> actions = new ArrayList<>(1);
-        actions.add("index");
-        
-        if (pathInfoList.size() >= 2) {
-            // we have module name and its action so fill up the list
-            actions = pathInfoList.subList(1, pathInfoList.size());
-        }
-        
-        return actions;
-    }
-    
-    /**
-     * Whether or not the request is an AJAX request.
-     * 
-     * @param pathInfoList the list of path elements
-     * @return <code>true</code> if the request is an AJAX request, <code>false</code> otherwise
-     */
-    private boolean isAjax(List<String> pathInfoList) {
-        
-        int size = pathInfoList.size();
-        
-        if (size > 2) {
-            return pathInfoList.remove(size - 1).equalsIgnoreCase("ajax");
-        }
-        
-        return false;
     }
     
     /**
