@@ -41,8 +41,9 @@ public abstract class Module {
     
     /**
      * The index action. This method will be invoked when client requests module's index page.
+     * @return 
      */
-    public abstract void index();
+    public abstract Object index();
     
     /**
      * Executes requested action. The method obtains action name out of request.
@@ -82,7 +83,8 @@ public abstract class Module {
             }
             
             request.setAttribute("actionTemplate", actionTemplate);
-            method.invoke(this); // TO DO: probably, we should output action content here
+            Object data = method.invoke(this);
+            request.setAttribute("data", data);
 
         } catch (NoSuchMethodException | SecurityException e) {
             throw new ServletException("The action '" + action + "' wasn't found.", e);

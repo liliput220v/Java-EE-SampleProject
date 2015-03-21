@@ -3,9 +3,9 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <h2>Actor list</h2>
-<c:if test="${fn:length(actors) gt 0}">
+<c:if test="${fn:length(data) gt 0}">
     <ul>
-        <c:forEach items="${actors}" var="actor">
+        <c:forEach items="${data}" var="actor">
             <li><c:out value="${actor.key} ${actor.value}" escapeXml="true"/></li>
         </c:forEach>
     </ul>

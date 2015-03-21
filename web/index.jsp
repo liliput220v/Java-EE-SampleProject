@@ -17,7 +17,7 @@
         <link href="${root}/css/styles.css" type="text/css" rel="stylesheet" media="all">
     </head>
     <body>
-        <h1>This is the template of the index page!</h1>
+        <h1>${heading}</h1>
         <jsp:include page="./views/${moduleName}/${actionTemplate}.jsp" />
     </body>
 </html>

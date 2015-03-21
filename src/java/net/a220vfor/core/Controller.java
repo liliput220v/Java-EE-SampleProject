@@ -66,7 +66,7 @@ public class Controller extends HttpServlet {
         
         try (PrintWriter out = response.getWriter()) {
             
-            JsonStructure json = (JsonStructure) request.getAttribute("json");
+            JsonStructure json = (JsonStructure) request.getAttribute("data");
             
             if (json == null) {
                 out.println("{error: \"No JSON object found!\"}");

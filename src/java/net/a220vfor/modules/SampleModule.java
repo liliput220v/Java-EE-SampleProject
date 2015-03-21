@@ -1,7 +1,6 @@
 
 package net.a220vfor.modules;
 
-import java.math.BigDecimal;
 import javax.json.Json;
 import javax.json.JsonObject;
 import net.a220vfor.core.FilteredHttpRequest;
@@ -19,11 +18,12 @@ public class SampleModule extends Module {
         template = "module";
         
         request.setAttribute("title", "Test page");
+        request.setAttribute("heading", "Sample module heading");
         request.setAttribute("module", this.getClass()); // debug
     }
     
     @Override
-    public void index() {
+    public Object index() {
         
         JsonObject json = Json.createObjectBuilder()
             .add("paramKey", "param-value + Кириллица")
@@ -32,7 +32,7 @@ public class SampleModule extends Module {
                 .add(System.currentTimeMillis()))
             .build();
         
-        request.setAttribute("json", json);
+        return json;
     }
     
 }

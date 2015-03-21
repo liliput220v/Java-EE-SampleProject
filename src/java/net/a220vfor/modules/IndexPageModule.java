@@ -31,7 +31,7 @@ public class IndexPageModule extends Module {
 
     @Override
     @ActionProperties(template = "index", method = "BOTH")
-    public void index() {
+    public Object index() {
         testDB();
         String sql = "SELECT first_name, last_name FROM actor LIMIT 10";
         try (
@@ -46,11 +46,13 @@ public class IndexPageModule extends Module {
                 actors.put(result.getString("first_name"), result.getString("last_name"));
             }
 
-            request.setAttribute("actors", actors);
+            return actors;
 
         } catch (SQLException e) {
             System.out.println("SQLException occurred: " + e.getMessage());
         }
+        
+        return null;
     }
     
     private void testDB() {
