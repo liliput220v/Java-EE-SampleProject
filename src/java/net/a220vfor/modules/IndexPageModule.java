@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
 import javax.sql.DataSource;
+import net.a220vfor.core.ActionProperties;
 import net.a220vfor.core.DB;
 import net.a220vfor.core.FilteredHttpRequest;
 import net.a220vfor.core.Module;
@@ -29,6 +30,7 @@ public class IndexPageModule extends Module {
     }
 
     @Override
+    @ActionProperties(template = "index", method = "BOTH")
     public void index() {
         testDB();
         String sql = "SELECT first_name, last_name FROM actor LIMIT 10";

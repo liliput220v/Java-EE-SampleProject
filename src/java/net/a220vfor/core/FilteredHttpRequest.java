@@ -402,9 +402,17 @@ public abstract class FilteredHttpRequest implements HttpServletRequest {
     /**
      * Retrieves requested action out of the URL path.
      * 
-     * @return 
+     * @return the exact action (a method to be invoked) name or 'index', if no action is provided
      */
-    public abstract String getAction();
+    public abstract String getActionName();
+    
+    /**
+     * Retrieves requested action name out of the URL path. Unlike <code>getActionName()</code> this method returns
+     * almost unfiltered action name (in lower case).
+     * 
+     * @return the exact action name or 'index', if no action is provided
+     */
+    public abstract String getActionNameAsRequested();
     
     /**
      * Retrieves a <code>List</code> of action parameters from the URL path.

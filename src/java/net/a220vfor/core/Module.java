@@ -3,7 +3,6 @@ package net.a220vfor.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 import javax.servlet.ServletException;
 
 /**
@@ -18,12 +17,7 @@ public abstract class Module {
      * The main template that is related to the module.
      */
     protected String template = "index";
-    
-    /**
-     * The action content template.
-     */
-    protected String actionTemplate;
-    
+        
     public Module(FilteredHttpRequest request) {
         this.request = request;
     }
@@ -51,24 +45,44 @@ public abstract class Module {
     public abstract void index();
     
     /**
-     * Executes requested action.
+     * Executes requested action. The method obtains action name out of request.
      * @throws ServletException if the action can't be found or invoked
      */
     public void executeAction() throws ServletException {
-        executeAction(request.getAction());
+        executeAction(request.getActionName());
     }
     
     /**
      * Executes requested action.
      * 
-     * @param action the action to be executed
+     * @param action the exact name of an action to be executed
      * @throws ServletException if the action can't be found or invoked
      */
     public void executeAction(String action) throws ServletException {
         
         try {
             Method method = this.getClass().getMethod(action);
-            method.invoke(this);
+            
+            String actionTemplate = request.getActionNameAsRequested();
+            String allowedMethod = "get";
+            
+            // get (or set) action properties
+            ActionProperties actProps = method.<ActionProperties>getAnnotation(ActionProperties.class);
+            
+            if (actProps != null) {
+                allowedMethod = actProps.method();
+                actionTemplate = actProps.template();
+            }
+            
+            if (!request.getMethod().equalsIgnoreCase(allowedMethod) && 
+                !allowedMethod.equalsIgnoreCase("both")) {
+                
+                throw new ServletException("The request method " + request.getMethod() 
+                    + " isn't supported by action '" + action +"'.");
+            }
+            
+            request.setAttribute("actionTemplate", actionTemplate);
+            method.invoke(this); // TO DO: probably, we should output action content here
 
         } catch (NoSuchMethodException | SecurityException e) {
             throw new ServletException("The action '" + action + "' wasn't found.", e);

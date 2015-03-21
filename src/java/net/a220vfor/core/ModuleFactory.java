@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package net.a220vfor.core;
 
 import java.lang.reflect.Constructor;
@@ -11,7 +7,7 @@ import java.util.Map;
 import javax.servlet.ServletException;
 
 /**
- *
+ * Simple module factory.
  * @author Andrew
  */
 public class ModuleFactory {
@@ -52,6 +48,7 @@ public class ModuleFactory {
         try {
             
             moduleName = moduleName.toLowerCase();
+            request.setAttribute("moduleName", moduleName);
             Class<?> moduleClass = Class.forName(availModules.get(moduleName));
             Constructor<?> constr = moduleClass.getConstructor(FilteredHttpRequest.class);
             

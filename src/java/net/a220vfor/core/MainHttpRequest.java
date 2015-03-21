@@ -22,7 +22,7 @@ public class MainHttpRequest extends FilteredHttpRequest {
      * Basically, a request path kind of /module-name/action/action-param-1/action-param-N will be split by the "/" 
      * character.
      * 
-     * @return a list of requested actions
+     * @return a list of substrings
      */
     @Override
     public List<String> getPathAsList() {
@@ -61,10 +61,10 @@ public class MainHttpRequest extends FilteredHttpRequest {
      * If the action is absent, it's assumed that module's index action has been requested. Dashes and underscores in
      * action name will be removed and replaced with camel case, e.g. my-action-name becomes myActionName.
      * 
-     * @return the action name or 'index', if no action is provided
+     * @return the exact action (a method to be invoked) name or 'index', if no action is provided
      */
     @Override
-    public String getAction() {
+    public String getActionName() {
         
         List<String> pathInfoList = getPathAsList();
         String action = "index";
@@ -72,6 +72,20 @@ public class MainHttpRequest extends FilteredHttpRequest {
         if (pathInfoList.size() >= 2) {
             // we have module name and its action
             action = dashToCamel(pathInfoList.get(1));
+        }
+        
+        return action;
+    }
+
+    @Override
+    public String getActionNameAsRequested() {
+        
+        List<String> pathInfoList = getPathAsList();
+        String action = "index";
+        
+        if (pathInfoList.size() >= 2) {
+            // we have module name and its action
+            action = pathInfoList.get(1).toLowerCase();
         }
         
         return action;
@@ -99,7 +113,7 @@ public class MainHttpRequest extends FilteredHttpRequest {
     
     @Override
     public boolean isAjax() {
-        Map<String, String> headers = getHeaderMap();System.out.println("Headers: "+headers);
+        Map<String, String> headers = getHeaderMap();
         return "XMLHttpRequest".equalsIgnoreCase(headers.get("x-requested-with"));
     }
     
