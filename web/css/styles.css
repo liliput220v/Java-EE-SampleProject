@@ -10,3 +10,14 @@ body {
     font-size: 14px;
     line-height: 20px;
 }
+
+nav a {
+    display: block;
+    border-bottom: 1px solid #000;
+    padding: 5px 0;
+    text-decoration: none;
+}
+
+nav a:last-of-type {
+    border-bottom: none;
+}

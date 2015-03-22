@@ -9,7 +9,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<c:set var="root" value="${pageContext.request.contextPath}" />
+<c:set var="root" value="${pageContext.request.contextPath}" scope="request"/>
 <html>
     <head>
         <meta charset="UTF-8">
@@ -17,6 +17,7 @@
         <link href="${root}/css/styles.css" type="text/css" rel="stylesheet" media="all">
     </head>
     <body>
+        <jsp:include page="./views/menu.jsp" />
         <h1>${heading}</h1>
         <jsp:include page="./views/${moduleName}/${actionTemplate}.jsp" />
     </body>
