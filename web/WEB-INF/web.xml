@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <filter>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <filter-class>net.a220vfor.core.UrlRewriteFilter</filter-class>
+        <init-param>
+            <param-name>static-res-1</param-name>
+            <param-value>css</param-value>
+        </init-param>
+        <init-param>
+            <param-name>static-res-2</param-name>
+            <param-value>js</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <servlet>
         <description>Application front controller</description>
         <servlet-name>Controller</servlet-name>
@@ -8,7 +24,6 @@
     <servlet-mapping>
         <servlet-name>Controller</servlet-name>
         <url-pattern>/app/*</url-pattern>
-        <url-pattern>/app</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
