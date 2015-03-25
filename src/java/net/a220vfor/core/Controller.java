@@ -1,45 +1,55 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package net.a220vfor.core;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import javax.json.Json;
 import javax.json.JsonStructure;
 import javax.json.JsonWriter;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * The application controller, its main entry point. Implements front controller pattern.
  * @author Andrew
  */
 public class Controller extends HttpServlet {
     
-    private Map<String, String> availModules;
+    private final Map<String, String> availModules = new HashMap<>();
     
-    {
-        availModules = new HashMap<>();
-        availModules.put("index", "net.a220vfor.modules.IndexPageModule");
-        availModules.put("module", "net.a220vfor.modules.SampleModule");
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        
+        Enumeration<String> paramNames = config.getInitParameterNames();
+        
+        while (paramNames.hasMoreElements()) {
+            
+            String moduleName = paramNames.nextElement();
+            availModules.put(
+                moduleName,
+                config.getInitParameter(moduleName)
+            );
+        }
     }
     
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * Receives HTTP requests from the public service method, process and forwards them to the view templates, or sends
+     * JSON object back to the client. This method won't call any of the doXXX methods.
      *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
+     * @param request the servlet request
+     * @param response the servlet response
+     * @throws ServletException if a servlet-specific error occurs and servlet cannot handle the request
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         // Example path: Servlet/app/module-name/action?param1=value1&param2=value2#hash
@@ -57,7 +67,7 @@ public class Controller extends HttpServlet {
         } else {
             filtRequest.getRequestDispatcher("/" + template + ".jsp").forward(filtRequest, response);
         }
-                
+        
     }
     
     private void sendJSON(FilteredHttpRequest request, HttpServletResponse response) throws IOException {
@@ -77,34 +87,6 @@ public class Controller extends HttpServlet {
                 jWriter.write(json);
             }
         }
-    }
-    
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
     }
 
     /**

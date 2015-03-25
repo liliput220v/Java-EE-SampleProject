@@ -20,6 +20,14 @@
         <description>Application front controller</description>
         <servlet-name>Controller</servlet-name>
         <servlet-class>net.a220vfor.core.Controller</servlet-class>
+        <init-param>
+            <param-name>index</param-name>
+            <param-value>net.a220vfor.modules.IndexPageModule</param-value>
+        </init-param>
+        <init-param>
+            <param-name>module</param-name>
+            <param-value>net.a220vfor.modules.SampleModule</param-value>
+        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>Controller</servlet-name>
